@@ -105,6 +105,13 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
         
+    struct timeval end;
+    if (gettimeofday(&end, NULL) == -1) {
+        perror("gettimeofday");
+        cleanup_shared_memory(start);
+        return EXIT_FAILURE;
+    } 
+        
     }
     fprintf(stderr, "Part 1 scaffold: command execution and timing are not added yet.\n");
 
