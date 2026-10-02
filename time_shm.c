@@ -73,11 +73,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    /* Hoang Nguyen: add fork() here.
-       Child: gettimeofday(start, NULL), then execvp(argv[1], &argv[1]).
-       Parent: wait for the child, get the end time, and print elapsed time.
-       Check errors and release the mapping on failure paths too.
-       Keep the parent's mapping until after the elapsed-time calculation. */
+    /* Hoang Nguyen: fork, run the command in the child, and measure the elapsed time in the parent. */
     pid_t pid = fork();
  
     if (pid == -1) {
@@ -97,7 +93,7 @@ int main(int argc, char *argv[])
         execvp(argv[1], &argv[1]);
         perror("execvp");
         exit(EXIT_FAILURE);
-
+    }
      // Parent: wait for the child, then save the end time.
     int status;
     if (waitpid(pid, &status, 0) == -1) {
@@ -120,13 +116,10 @@ int main(int argc, char *argv[])
     double elapsed = seconds + microseconds / 1000000.0;
  
     printf("Elapsed time: %.6f seconds\n", elapsed);
- 
-    if (cleanup_shared_memory(start) == -1) {
-        return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
-    }
+
+    /*
     fprintf(stderr, "Part 1 scaffold: command execution and timing are not added yet.\n");
+    */
 
     if (cleanup_shared_memory(start) == -1) {
         return EXIT_FAILURE;
