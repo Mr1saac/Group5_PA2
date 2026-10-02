@@ -111,7 +111,19 @@ int main(int argc, char *argv[])
         cleanup_shared_memory(start);
         return EXIT_FAILURE;
     } 
-        
+
+
+     /* Elapsed time = end - start (seconds and microseconds). */
+    long seconds = end.tv_sec - start->tv_sec;
+    long microseconds = end.tv_usec - start->tv_usec;
+    double elapsed = seconds + microseconds / 1000000.0;
+ 
+    printf("Elapsed time: %.6f seconds\n", elapsed);
+ 
+    if (cleanup_shared_memory(start) == -1) {
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
     }
     fprintf(stderr, "Part 1 scaffold: command execution and timing are not added yet.\n");
 
