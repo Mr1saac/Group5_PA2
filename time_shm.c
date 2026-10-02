@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    /* Person 2: add fork() here.
+    /* Hoang Nguyen: add fork() here.
        Child: gettimeofday(start, NULL), then execvp(argv[1], &argv[1]).
        Parent: wait for the child, get the end time, and print elapsed time.
        Check errors and release the mapping on failure paths too.
@@ -86,12 +86,17 @@ int main(int argc, char *argv[])
     }
 
     if (pid == 0) {
-        /* Child: save the start time into shared memory. */
+        // Child: save the start time into shared memory.
         if (gettimeofday(start, NULL) == -1) {
             perror("gettimeofday");
             exit(EXIT_FAILURE);
         }
-        
+
+        // Run the command. If this returns, the command could not run. 
+        execvp(argv[1], &argv[1]);
+        perror("execvp");
+        exit(EXIT_FAILURE);
+    }
     fprintf(stderr, "Part 1 scaffold: command execution and timing are not added yet.\n");
 
     if (cleanup_shared_memory(start) == -1) {
