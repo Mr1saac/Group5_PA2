@@ -84,6 +84,14 @@ int main(int argc, char *argv[])
         cleanup_shared_memory(start);
         return EXIT_FAILURE;
     }
+
+    if (pid == 0) {
+        /* Child: save the start time into shared memory. */
+        if (gettimeofday(start, NULL) == -1) {
+            perror("gettimeofday");
+            exit(EXIT_FAILURE);
+        }
+        
     fprintf(stderr, "Part 1 scaffold: command execution and timing are not added yet.\n");
 
     if (cleanup_shared_memory(start) == -1) {
