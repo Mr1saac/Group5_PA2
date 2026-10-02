@@ -96,6 +96,15 @@ int main(int argc, char *argv[])
         execvp(argv[1], &argv[1]);
         perror("execvp");
         exit(EXIT_FAILURE);
+
+     // Parent: wait for the child, then save the end time.
+    int status;
+    if (waitpid(pid, &status, 0) == -1) {
+        perror("waitpid");
+        cleanup_shared_memory(start);
+        return EXIT_FAILURE;
+    }
+        
     }
     fprintf(stderr, "Part 1 scaffold: command execution and timing are not added yet.\n");
 
