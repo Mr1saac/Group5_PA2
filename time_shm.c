@@ -77,6 +77,13 @@ int main(int argc, char *argv[])
        Parent: wait for the child, get the end time, and print elapsed time.
        Check errors and release the mapping on failure paths too.
        Keep the parent's mapping until after the elapsed-time calculation. */
+    pid_t pid = fork();
+ 
+    if (pid == -1) {
+        perror("fork");
+        cleanup_shared_memory(start);
+        return EXIT_FAILURE;
+    }
     fprintf(stderr, "Part 1 scaffold: command execution and timing are not added yet.\n");
 
     if (cleanup_shared_memory(start) == -1) {
