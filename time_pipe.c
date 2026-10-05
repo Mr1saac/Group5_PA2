@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 
@@ -93,5 +94,70 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    pid_t pid = fork();
+
+    if (pid == -1) {
+        perror("fork");
+        close(pipefd[0]);
+        close(pipefd[1]);
+        return EXIT_FAILURE;
+    }
+
+    if (pid == 0) {
+        struct timeval start;
+
+        if (gettimeofday(&start, NULL) == -1) {
+            perror("gettimeofday");
+            close(pipefd[0]);
+            close(pipefd[1]);
+            exit(EXIT_FAILURE);
+        }
+
+        if (write_start_time(pipefd, &start) == -1) {
+            exit(EXIT_FAILURE);
+        }
+        
+        excevp(argv[1], &argv[1]);
+
+        perror("execvp");
+        exit(EXIT_FAILURE);
+    }
+    struct timeval start;
+
+    if (read_start_time(pipefd, &start) == -1) {
+        waitpid(pid, NULL, 0);
+        return EXIT_FAILURE;
+    }
+    int status;
+
+    if (waitpid(pid, &status, 0) == -1) {
+        perror("waitpid");
+        return EXIT_FAILURE;
+    }
+
+    struct timeval end;
+
+    if (gettimeofday(&end, NULL) == -1) {
+        perror("gettimeofday");
+        return EXIT_FAILURE;
+    }
+
+    long seconds = end.tv_sec - start.tv_sec;
+    long microseconds = end.tv_usec - start.tv_usec;
+
+    double elapsed = second + microseconds / 1000000.0;
+
+    printf("Elapsed time: %.6f seconds\n", elapsed);
+
     return EXIT_SUCCESS;
 }
+
+
+
+    
+
+
+
+
+
+   
