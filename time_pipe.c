@@ -1,5 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -51,12 +52,6 @@ static int write_start_time(int pipefd[2], struct timeval *start)
 
 static int read_start_time(int pipefd[2], struct timeval *start)
 {
-    if (close(pipefd[1]) == -1) {
-        perror("close");
-        close(pipefd[0]);
-        return -1;
-    }
-
     ssize_t bytes_read =
         read(pipefd[0], start, sizeof(*start));
 
@@ -110,35 +105,47 @@ int main(int argc, char *argv[])
             perror("gettimeofday");
             close(pipefd[0]);
             close(pipefd[1]);
-            exit(EXIT_FAILURE);
+            _exit(EXIT_FAILURE);
         }
 
         if (write_start_time(pipefd, &start) == -1) {
-            exit(EXIT_FAILURE);
+            _exit(EXIT_FAILURE);
         }
         
         execvp(argv[1], &argv[1]);
 
         perror("execvp");
-        exit(EXIT_FAILURE);
+        _exit(EXIT_FAILURE);
     }
-    struct timeval start;
-
-    if (read_start_time(pipefd, &start) == -1) {
-        waitpid(pid, NULL, 0);
+    /* Parent: close the unused writer, wait, then record the end time. */
+    if (close(pipefd[1]) == -1) {
+        perror("close");
+        close(pipefd[0]);
+        while (waitpid(pid, NULL, 0) == -1 && errno == EINTR) {}
         return EXIT_FAILURE;
     }
-    int status;
 
-    if (waitpid(pid, &status, 0) == -1) {
+    int status;
+    pid_t waited;
+    do {
+        waited = waitpid(pid, &status, 0);
+    } while (waited == -1 && errno == EINTR);
+
+    if (waited == -1) {
         perror("waitpid");
+        close(pipefd[0]);
         return EXIT_FAILURE;
     }
 
     struct timeval end;
-
     if (gettimeofday(&end, NULL) == -1) {
         perror("gettimeofday");
+        close(pipefd[0]);
+        return EXIT_FAILURE;
+    }
+
+    struct timeval start;
+    if (read_start_time(pipefd, &start) == -1) {
         return EXIT_FAILURE;
     }
 
@@ -149,15 +156,11 @@ int main(int argc, char *argv[])
 
     printf("Elapsed time: %.6f seconds\n", elapsed);
 
-    return EXIT_SUCCESS;
+    if (WIFEXITED(status)) {
+        return WEXITSTATUS(status);
+    }
+    if (WIFSIGNALED(status)) {
+        return 128 + WTERMSIG(status);
+    }
+    return EXIT_FAILURE;
 }
-
-
-
-    
-
-
-
-
-
-   
