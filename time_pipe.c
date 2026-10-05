@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
             exit(EXIT_FAILURE);
         }
         
-        excevp(argv[1], &argv[1]);
+        execvp(argv[1], &argv[1]);
 
         perror("execvp");
         exit(EXIT_FAILURE);
