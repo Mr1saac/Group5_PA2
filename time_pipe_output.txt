@@ -1,0 +1,15 @@
+time_pipe.c
+time_pipe.exe
+time_shm.c
+time_shm.exe
+Elapsed time: 0.038510 seconds
+total 145
+-rw-r--r-- 1 Jason None  3034 Oct  5 01:16 time_pipe.c
+-rwxr-xr-x 1 Jason None 65777 Oct  5 01:17 time_pipe.exe
+-rw-r--r-- 1 Jason None    81 Oct  5 01:21 time_pipe_output.txt
+-rw-r--r-- 1 Jason None  3254 Oct  5 01:16 time_shm.c
+-rwxr-xr-x 1 Jason None 65777 Oct  5 01:17 time_shm.exe
+Elapsed time: 0.042039 seconds
+/home/Jason/Group5_PA2
+Elapsed time: 0.038525 seconds
+Elapsed time: 1.026288 seconds
