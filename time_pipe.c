@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
     long seconds = end.tv_sec - start.tv_sec;
     long microseconds = end.tv_usec - start.tv_usec;
 
-    double elapsed = second + microseconds / 1000000.0;
+    double elapsed = seconds + microseconds / 1000000.0;
 
     printf("Elapsed time: %.6f seconds\n", elapsed);
 
