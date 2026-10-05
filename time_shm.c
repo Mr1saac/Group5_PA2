@@ -1,5 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,6 +74,9 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    start->tv_sec = -1;
+    start->tv_usec = 0;
+
     /* Hoang Nguyen: fork, run the command in the child, and measure the elapsed time in the parent. */
     pid_t pid = fork();
  
@@ -84,19 +88,27 @@ int main(int argc, char *argv[])
 
     if (pid == 0) {
         // Child: save the start time into shared memory.
-        if (gettimeofday(start, NULL) == -1) {
+        struct timeval child_start;
+        if (gettimeofday(&child_start, NULL) == -1) {
             perror("gettimeofday");
-            exit(EXIT_FAILURE);
+            _exit(EXIT_FAILURE);
         }
+
+        *start = child_start;
 
         // Run the command. If this returns, the command could not run. 
         execvp(argv[1], &argv[1]);
         perror("execvp");
-        exit(EXIT_FAILURE);
+        _exit(EXIT_FAILURE);
     }
      // Parent: wait for the child, then save the end time.
     int status;
-    if (waitpid(pid, &status, 0) == -1) {
+    pid_t waited;
+    do {
+        waited = waitpid(pid, &status, 0);
+    } while (waited == -1 && errno == EINTR);
+
+    if (waited == -1) {
         perror("waitpid");
         cleanup_shared_memory(start);
         return EXIT_FAILURE;
@@ -110,6 +122,12 @@ int main(int argc, char *argv[])
     } 
 
 
+    if (start->tv_sec == -1) {
+        fprintf(stderr, "Child did not record a start time.\n");
+        cleanup_shared_memory(start);
+        return EXIT_FAILURE;
+    }
+
      /* Elapsed time = end - start (seconds and microseconds). */
     long seconds = end.tv_sec - start->tv_sec;
     long microseconds = end.tv_usec - start->tv_usec;
@@ -117,12 +135,15 @@ int main(int argc, char *argv[])
  
     printf("Elapsed time: %.6f seconds\n", elapsed);
 
-    /*
-    fprintf(stderr, "Part 1 scaffold: command execution and timing are not added yet.\n");
-    */
-
     if (cleanup_shared_memory(start) == -1) {
         return EXIT_FAILURE;
     }
-    return EXIT_SUCCESS;
+    if (WIFEXITED(status)) {
+        return WEXITSTATUS(status);
+    }
+    if (WIFSIGNALED(status)) {
+        return 128 + WTERMSIG(status);
+    }
+    return EXIT_FAILURE;
 }
+
