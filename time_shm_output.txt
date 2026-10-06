@@ -1,18 +1,20 @@
+README.md
 time_pipe.c
 time_pipe.exe
 time_pipe_output.txt
 time_shm.c
 time_shm.exe
 time_shm_output.txt
-Elapsed time: 0.039261 seconds
-total 146
--rw-r--r-- 1 Jason None  3034 Oct  5 01:16 time_pipe.c
--rwxr-xr-x 1 Jason None 65777 Oct  5 01:17 time_pipe.exe
--rw-r--r-- 1 Jason None   493 Oct  5 01:21 time_pipe_output.txt
--rw-r--r-- 1 Jason None  3254 Oct  5 01:16 time_shm.c
--rwxr-xr-x 1 Jason None 65777 Oct  5 01:17 time_shm.exe
--rw-r--r-- 1 Jason None   122 Oct  5 01:22 time_shm_output.txt
-Elapsed time: 0.047245 seconds
+Elapsed time: 0.144865 seconds
+total 152
+-rw-r--r-- 1 Jason None   888 Oct  5 17:47 README.md
+-rw-r--r-- 1 Jason None  3454 Oct  5 17:47 time_pipe.c
+-rwxr-xr-x 1 Jason None 65396 Oct  5 17:48 time_pipe.exe
+-rw-r--r-- 1 Jason None   660 Oct  5 17:50 time_pipe_output.txt
+-rw-r--r-- 1 Jason None  3709 Oct  5 17:47 time_shm.c
+-rwxr-xr-x 1 Jason None 66165 Oct  5 17:48 time_shm.exe
+-rw-r--r-- 1 Jason None   132 Oct  5 17:50 time_shm_output.txt
+Elapsed time: 0.060310 seconds
 /home/Jason/Group5_PA2
-Elapsed time: 0.033991 seconds
-Elapsed time: 1.037606 seconds
+Elapsed time: 0.048331 seconds
+Elapsed time: 1.034581 seconds
